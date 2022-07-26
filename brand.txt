@@ -1,0 +1,3 @@
+#will be insert automatic during script running
+#format ip brand hosname
+xxx.xxx.xxx.xxx cisco SWxxxxx01
