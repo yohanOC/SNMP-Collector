@@ -1,13 +1,12 @@
 #!bin/bash
 function_collector() {
 	echo "$ip will be start collecting data"
-	snmpwalk -v 2c -c xxx $ip sysDescr.0 > result.txt
-	snmpwalk -v 2c -c xxx $ip sysName.0 > hostname.txt
-	hostname="$(cut hostname.txt -c 33-100)"
+	snmpget -v 2c -c xxx $ip sysDescr.0 sysName.0 > result.txt
+	hostname="$(cat result.txt | tail -1 | cut -c 33-100)"
 	for line in $(cat list_brand.txt); 
 		do 
 			brand="$(cat result.txt | grep -i $line | wc -l)"
-			brand1="$(cat result.txt | sed -e "s/^.*\(.\)$/\1/")"
+			brand1="$(cat result.txt | head -1 | sed -e "s/^.*\(.\)$/\1/")"
 			if [ $brand -gt 0 ]
 			then
 				echo "$ip $line $hostname" >> brand.txt
