@@ -4,38 +4,24 @@ function_collector() {
 	snmpwalk -v 2c -c xxx $ip sysDescr.0 > result.txt
 	snmpwalk -v 2c -c xxx $ip sysName.0 > hostname.txt
 	hostname="$(cut hostname.txt -c 33-100)"
-	brand1="$(cat result.txt | grep -i brand1 | wc -l)"
-	brand2="$(cat result.txt | grep -i brand2 | wc -l)"
-	brand3="$(cat result.txt | grep -i brand3 | wc -l)"
-	brand4="$(cat result.txt | grep -i brand4 | wc -l)"
-	brand5="$(cat result.txt | grep -i brand5 | wc -l)"
-	brand6="$(cat result.txt | sed -e "s/^.*\(.\)$/\1/")"
+	for line in $(cat list_brand.txt); 
+		do 
+			brand="$(cat result.txt | grep -i $line | wc -l)"
+			brand1="$(cat result.txt | sed -e "s/^.*\(.\)$/\1/")"
+			if [ $brand -gt 0 ]
+			then
+				echo "$ip $line $hostname" >> brand.txt
+			elif 
+				[[ "$brand1" == "J" ]]
+			then
+				brand_1="Juniper"
+				if [[ "$brand_1" == "$line" ]]
+				then
+					echo "$ip $line $hostname" >> brand.txt
+				fi
+			fi
 
-	if  
-	[ $brand1-gt 0 ]
-	then
-		echo "$ip brand1 $hostname" >> brand.txt
-	elif 
-	[ $brand2 -gt 0 ]
-	then
-		echo "$ip brand2 $hostname" >> brand.txt
-	elif 
-	[ $brand3 -gt 0 ]
-	then
-		echo "$ip brand3 $hostname" >> brand.txt
-	elif
-	[ $brand4 -gt 0 ]
-	then
-		echo "$ip brand4 $hostname" >> brand.txt
-	elif
-	[ $brand5 -gt 0 ]
-	then
-		echo "$ip brand5 $hostname" >> brand.txt
-	elif
-	[[ "$brand6" == "J" ]]
-	then 
-		echo "$ip brand6 $hostname" >> brand.txt
-	fi
+	done
 }
 
 while IFS= read -r ip; do #open file and store to variable ip
